@@ -10,7 +10,7 @@ router.route('/').get(function(req, res){
     else{
       res.json(orders)
     }
-  }).sort({"time": -1}).populate('drinks.drink').populate('user');
+  }).sort({"time": -1}).populate('drinks.drink').populate('user').sort({time: 'desc', test: 1});
 })
 
 router.route('/:id').get(function(req, res) {

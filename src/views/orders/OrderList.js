@@ -6,17 +6,18 @@
  */
 import React from "react";
 import axios from "axios";
-import { Card, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
+import OrderItem from '../../components/UI/OrderItem'
 
-import { Link } from "react-router-dom";
 
 class OrderList extends React.Component {
   constructor(props){
     super(props);
 
+
     this.state ={
       orders: [],
-      search: ''
+      search: '',
     }
   }
 
@@ -24,18 +25,22 @@ class OrderList extends React.Component {
     this.setState({search: e.target.value});
   }
 
+
   componentDidMount(){
-    axios.get('http://localhost:4000/orders')
-    .then(res => {
-      this.setState({
-        orders: res.data
+    this.interval = setInterval(() => {
+      axios.get('http://localhost:4000/orders')
+      .then(res => {
+        this.setState({
+          orders: res.data
+        })
       })
-    })
-    .catch(err=> console.log(err))
+      .catch(err=> console.log(err))
+    }, 1000)
   }
 
   render() {
     const orders = this.state.orders
+    console.log(orders);
     let filteredOrders = orders.filter(
       (order) => {
         if(order.tableNumber === this.state.search){
@@ -46,6 +51,14 @@ class OrderList extends React.Component {
         }
       }
     )
+
+    const styles={
+      container: {
+        border: "1px solid #333334",
+        marginBottom: 5
+      }
+    }
+
     return (
       <>
       <Form>
@@ -53,14 +66,16 @@ class OrderList extends React.Component {
         type="text" placeholder="Search by table number..." value={this.state.search} onChange={this.updateSearch.bind(this)}/>
       </Form>
       {filteredOrders.map(order => {
+
         return (
-          <Card key={order._id}>
-          <Card.Body>
-            <Card.Title>Table: {order.tableNumber}</Card.Title>
-            <Card.Text>Total Price: ${order.totalPrice.toFixed(2)}</Card.Text>
-            <Link to={'/orders/' + order._id}>View Details</Link>
-          </Card.Body>
-          </Card>
+          <div key={order._id} style={styles.container}>
+            <OrderItem
+              id={order._id}
+              table={order.tableNumber}
+              date={order.time}
+              price={order.totalPrice}
+              />
+            </div>
         )
       })}
 </>

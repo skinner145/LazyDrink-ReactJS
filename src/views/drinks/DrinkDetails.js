@@ -6,7 +6,7 @@
  */
 import React from "react";
 import axios from "axios";
-import { Card, Table } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 
 import { Link } from "react-router-dom";
 

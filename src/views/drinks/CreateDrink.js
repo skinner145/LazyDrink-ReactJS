@@ -7,7 +7,6 @@
 import React from "react";
 import axios from "axios";
 import { Form, Button, Card } from "react-bootstrap";
-import { withRouter } from "react-router-dom";
 
 class CreateDrink extends React.Component {
   constructor(props) {

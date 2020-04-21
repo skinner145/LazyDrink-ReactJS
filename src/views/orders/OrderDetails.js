@@ -6,9 +6,8 @@
  */
 import React from "react";
 import axios from "axios";
-import { Card, Jumbotron, Table } from "react-bootstrap";
+import { Card, Table } from "react-bootstrap";
 
-import { Link } from "react-router-dom";
 import moment from 'moment';
 
 class OrderList extends React.Component {

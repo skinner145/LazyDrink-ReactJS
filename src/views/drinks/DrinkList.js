@@ -6,7 +6,7 @@
  */
 import React from "react";
 import axios from "axios";
-import { Card, Form, ListGroup } from "react-bootstrap";
+import { Form, ListGroup, Pagination } from "react-bootstrap";
 
 import { Link } from "react-router-dom";
 
@@ -19,26 +19,37 @@ class DrinkList extends React.Component {
       types: [],
       refine: '',
       search: '',
-      filteredArray: []
+      filteredArray: [],
+      currentPage: 1,
+      itemsPerPage: 15
     }
+    this.handleClick = this.handleClick.bind(this);
   }
 
   componentDidMount(){
-    axios.get('http://localhost:4000/drinks')
-    .then(res => {
-      this.setState({
-        drinks: res.data
+    this.interval = setInterval(() => {
+      axios.get('http://localhost:4000/drinks')
+      .then(res => {
+        this.setState({
+          drinks: res.data
+        })
       })
-    })
-    .catch(err=> console.log(err))
-    axios.get('http://localhost:4000/types')
-    .then(res => {
-      this.setState({
-        types: res.data
+      .catch(err=> console.log(err))
+      axios.get('http://localhost:4000/types')
+      .then(res => {
+        this.setState({
+          types: res.data
+        })
       })
-    })
-    .catch(err => console.log(err))
+      .catch(err => console.log(err))
+    }, 1000)
   }
+
+  handleClick(event){
+  this.setState({
+    currentPage: Number(event.target.id) //setting current page to number selected by user
+  });
+}
 
   updateSearch(e){
     this.setState({
@@ -48,12 +59,29 @@ class DrinkList extends React.Component {
 
   render() {
     const drinks = this.state.drinks
-
+    let { currentPage, itemsPerPage } = this.state;
     let filteredDrinks = drinks.filter(
       drink => {
         return drink.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1;
       }
     )
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage
+
+    const currentItems = filteredDrinks.slice(indexOfFirstItem, indexOfLastItem)
+
+    const pageNumbers = []
+    for(let i = 1; i <= Math.ceil(filteredDrinks.length/itemsPerPage); i++){
+      pageNumbers.push(i)
+    }
+    let active;
+    const renderPageNumbers = pageNumbers.map(number => {
+      return(
+        <Pagination.Item key={number} id={number} onClick={this.handleClick} active={number === active}>{number}</Pagination.Item>
+      )
+    })
 
     return(
       <>
@@ -61,7 +89,7 @@ class DrinkList extends React.Component {
           <Form.Control type="text" value={this.search} onChange={this.updateSearch.bind(this)} />
         </Form>
         <ListGroup>
-          {filteredDrinks.map(drink => {
+          {currentItems.map(drink => {
             return(
               <ListGroup.Item key={drink._id}>
                 <Link to={"/drinks/" + drink._id}>{drink.name}</Link>
@@ -69,6 +97,10 @@ class DrinkList extends React.Component {
             )
           })}
         </ListGroup>
+        <Pagination id="page-numbers">
+          {renderPageNumbers}
+        </Pagination>
+
       </>
     )
   }

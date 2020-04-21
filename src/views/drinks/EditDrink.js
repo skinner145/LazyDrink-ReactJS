@@ -92,7 +92,7 @@ class EditDrink extends React.Component {
             >
             {types.map(type => {
               return(
-                <option key={type._id} key={type._id}>
+                <option key={type._id} id={type._id}>
                   {type.name}
                 </option>
               )
